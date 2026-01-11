@@ -5,7 +5,7 @@
         <AssemblyName>CleanArchitecture.Application.FunctionalTests</AssemblyName>
     </PropertyGroup>
 
-    <!--#if (UsePostgreSQL || UseSqlServer)-->
+
     <ItemGroup>
       <None Remove="appsettings.json" />
     </ItemGroup>
@@ -35,12 +35,7 @@
       <PackageReference Include="Moq" />
       <PackageReference Include="Respawn" />
       <PackageReference Include="Shouldly" />
-      <!--#if (UsePostgreSQL)-->
-      <PackageReference Include="Testcontainers.PostgreSql" />
-      <!--#endif-->
-      <!--#if (UseSqlServer)-->
       <PackageReference Include="Testcontainers.MsSql" />
-      <!--#endif-->
     </ItemGroup>
     
     <ItemGroup>

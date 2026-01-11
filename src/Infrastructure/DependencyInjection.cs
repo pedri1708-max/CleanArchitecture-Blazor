@@ -24,23 +24,11 @@ public static class DependencyInjection
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-#if (UsePostgreSQL)
-            options.UseNpgsql(connectionString);
-#elif (UseSqlite)
-            options.UseSqlite(connectionString);
-#else
             options.UseSqlServer(connectionString);
-#endif
             options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
-#if (UseAspire)
-#if (UsePostgreSQL)
-        builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
-#elif (UseSqlServer)
-        builder.EnrichSqlServerDbContext<ApplicationDbContext>();
-#endif
-#endif
+
 
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
