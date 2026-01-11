@@ -1,0 +1,73 @@
+# Azure DevOps Build Pipeline for UI (Blazor)
+# Builds and publishes the Blazor WebAssembly artifacts
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - 'src/Web/ClientApp/**' # Only trigger on UI changes
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - 'src/Web/ClientApp/**'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+  - checkout: self
+    displayName: 'Checkout code'
+
+  # Install Node.js (often required for Blazor toolchains/Tailwind/etc)
+  - task: NodeTool@0
+    displayName: 'Install Node.js'
+    inputs:
+      versionSpec: '20.x'
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore UI'
+    inputs:
+      command: 'restore'
+      projects: 'src/Web/ClientApp/ClientApp.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build UI'
+    inputs:
+      command: 'build'
+      projects: 'src/Web/ClientApp/ClientApp.csproj'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish UI'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: 'src/Web/ClientApp/ClientApp.csproj'
+      arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/ui'
+      zipAfterPublish: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: ui-drop'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/ui'
+      ArtifactName: 'ui-drop'
+      publishLocation: 'Container'

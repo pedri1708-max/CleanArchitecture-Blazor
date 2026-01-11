@@ -1,0 +1,63 @@
+# Azure DevOps Pipeline for NuGet Package Publishing
+# Equivalent to .github/workflows/package.yml
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - 'CleanArchitecture.nuspec'
+
+# Manual trigger support
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - checkout: self
+    displayName: 'Checkout code'
+
+  - task: NuGetToolInstaller@1
+    displayName: 'Setup NuGet'
+    inputs:
+      versionSpec: '>=6.x'
+      checkLatest: true
+
+  - task: Bash@3
+    displayName: 'Install Mono'
+    inputs:
+      targetType: 'inline'
+      script: |
+        sudo apt-get update && sudo apt-get install -y mono-complete
+
+  - task: Bash@3
+    displayName: 'Create the package'
+    inputs:
+      targetType: 'inline'
+      script: |
+        nuget pack CleanArchitecture.nuspec -NoDefaultExcludes
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+  # Option 1: Push to NuGet.org using service connection
+  - task: NuGetCommand@2
+    displayName: 'Publish package to NuGet.org'
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.SourcesDirectory)/**/*.nupkg'
+      nuGetFeedType: 'external'
+      publishFeedCredentials: 'NuGet-Service-Connection'  # Replace with your service connection name
+      allowPackageConflicts: true  # Skip duplicates
+
+  # Option 2: Push using API key from pipeline variables
+  # Uncomment if you prefer this approach
+  # - task: Bash@3
+  #   displayName: 'Publish package to NuGet.org (with API key)'
+  #   inputs:
+  #     targetType: 'inline'
+  #     script: |
+  #       nuget push *.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey $(NUGET_API_KEY) -SkipDuplicate
+  #     workingDirectory: '$(Build.SourcesDirectory)'
+  #   env:
+  #     NUGET_API_KEY: $(NUGET_API_KEY)  # Set as secret variable in pipeline

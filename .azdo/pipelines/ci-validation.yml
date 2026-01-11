@@ -1,0 +1,95 @@
+# Azure DevOps Pipeline for CI Validation
+# This pipeline runs on pull requests to validate code quality
+
+trigger: none  # Only run on PRs
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+      - feature/*
+  paths:
+    exclude:
+      - '.scripts/**'
+      - '*.md'
+      - .gitignore
+      - LICENSE
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+  - stage: Validate
+    displayName: 'Validation Stage'
+    jobs:
+      - job: Build
+        displayName: 'Build and Test'
+        steps:
+          - checkout: self
+            displayName: 'Checkout code'
+
+          - task: Cache@2
+            displayName: 'Cache NuGet packages'
+            inputs:
+              key: 'nuget | "$(Agent.OS)" | **/packages.lock.json'
+              restoreKeys: |
+                nuget | "$(Agent.OS)"
+              path: $(NUGET_PACKAGES)
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '20.x'
+
+          - task: UseDotNet@2
+            displayName: 'Install .NET SDK'
+            inputs:
+              packageType: 'sdk'
+              useGlobalJson: true
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore solution'
+            inputs:
+              command: 'restore'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build solution'
+            inputs:
+              command: 'build'
+              arguments: '--no-restore --configuration $(buildConfiguration)'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Run tests'
+            inputs:
+              command: 'test'
+              arguments: '--no-build --configuration $(buildConfiguration) --filter "FullyQualifiedName!~AcceptanceTests" --collect:"XPlat Code Coverage"'
+              publishTestResults: true
+
+          - task: PublishCodeCoverageResults@2
+            displayName: 'Publish code coverage'
+            inputs:
+              summaryFileLocation: '$(Agent.TempDirectory)/**/*.cobertura.xml'
+              codecoverageTool: 'Cobertura'
+
+      - job: CodeQuality
+        displayName: 'Code Quality Checks'
+        steps:
+          - checkout: self
+            displayName: 'Checkout code'
+
+          - task: UseDotNet@2
+            displayName: 'Install .NET SDK'
+            inputs:
+              packageType: 'sdk'
+              useGlobalJson: true
+
+          # Run code analysis
+          - task: DotNetCoreCLI@2
+            displayName: 'Run code analysis'
+            inputs:
+              command: 'build'
+              arguments: '/p:RunAnalyzers=true /p:TreatWarningsAsErrors=false'

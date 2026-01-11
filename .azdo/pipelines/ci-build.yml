@@ -1,0 +1,106 @@
+# Azure DevOps Pipeline for Build and Test
+# Equivalent to .github/workflows/build.yml
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - '.scripts/**'
+      - .gitignore
+      - CODE_OF_CONDUCT.md
+      - LICENSE
+      - README.md
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - '.scripts/**'
+      - .gitignore
+      - CODE_OF_CONDUCT.md
+      - LICENSE
+      - README.md
+
+parameters:
+  - name: buildArtifacts
+    displayName: 'Build and publish artifacts'
+    type: boolean
+    default: false
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+  - checkout: self
+    displayName: 'Checkout code'
+
+  - task: Cache@2
+    displayName: 'Cache NuGet packages'
+    inputs:
+      key: 'nuget | "$(Agent.OS)" | **/packages.lock.json'
+      restoreKeys: |
+        nuget | "$(Agent.OS)"
+      path: $(NUGET_PACKAGES)
+
+  # Install Node & cache npm packages
+  - task: NodeTool@0
+    displayName: 'Install Node.js'
+    inputs:
+      versionSpec: '20.x'
+
+  - task: Cache@2
+    displayName: 'Cache npm packages'
+    inputs:
+      key: 'npm | "$(Agent.OS)" | src/Web/ClientApp/package-lock.json'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+      path: $(npm_config_cache)
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore solution'
+    inputs:
+      command: 'restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build solution'
+    inputs:
+      command: 'build'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Test solution'
+    inputs:
+      command: 'test'
+      arguments: '--no-build --configuration $(buildConfiguration) --filter "FullyQualifiedName!~AcceptanceTests"'
+      publishTestResults: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish website'
+    condition: eq('${{ parameters.buildArtifacts }}', true)
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: 'src/Web/Web.csproj'
+      arguments: '--configuration $(buildConfiguration) --runtime win-x86 --self-contained --output $(Build.ArtifactStagingDirectory)/publish'
+      zipAfterPublish: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Upload website artifact'
+    condition: eq('${{ parameters.buildArtifacts }}', true)
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/publish'
+      ArtifactName: 'website'
+      publishLocation: 'Container'

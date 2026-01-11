@@ -1,0 +1,73 @@
+# Azure DevOps Pipeline for Security Scanning
+# Equivalent to .github/workflows/codeql.yml
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - .gitignore
+      - CODE_OF_CONDUCT.md
+      - LICENSE
+      - README.md
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - .gitignore
+      - CODE_OF_CONDUCT.md
+      - LICENSE
+      - README.md
+
+schedules:
+  - cron: "0 0 * * 1"  # Every Monday at midnight
+    displayName: 'Weekly security scan'
+    branches:
+      include:
+        - main
+    always: true
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - checkout: self
+    displayName: 'Checkout repository'
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+
+  # Microsoft Security DevOps extension provides security scanning
+  # Install from: https://marketplace.visualstudio.com/items?itemName=ms-securitydevops.microsoft-security-devops-azdevops
+  - task: MicrosoftSecurityDevOps@1
+    displayName: 'Run Microsoft Security DevOps'
+    inputs:
+      categories: 'code'
+      tools: 'credscan,roslyn'
+    env:
+      SkipNSwag: 'True'
+
+  # Alternative: Use CodeQL CLI directly
+  # - script: |
+  #     wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+  #     tar -xvzf codeql-bundle-linux64.tar.gz
+  #     ./codeql/codeql database create codeql-db --language=csharp
+  #     ./codeql/codeql database analyze codeql-db --format=sarif-latest --output=results.sarif
+  #   displayName: 'Run CodeQL Analysis'
+  #   env:
+  #     SkipNSwag: 'True'
+
+  - task: PublishSecurityAnalysisLogs@3
+    displayName: 'Publish Security Analysis Logs'
+    inputs:
+      ArtifactName: 'CodeAnalysisLogs'
+      ArtifactType: 'Container'
+      AllTools: true
+      ToolLogsNotFoundAction: 'Standard'

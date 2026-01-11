@@ -1,37 +1,36 @@
 # Clean Architecture Solution Template
 
-[![Build](https://github.com/jasontaylordev/CleanArchitecture/actions/workflows/build.yml/badge.svg)](https://github.com/jasontaylordev/CleanArchitecture/actions/workflows/build.yml)
-[![CodeQL](https://github.com/jasontaylordev/CleanArchitecture/actions/workflows/codeql.yml/badge.svg)](https://github.com/jasontaylordev/CleanArchitecture/actions/workflows/codeql.yml)
-[![Nuget](https://img.shields.io/nuget/v/Clean.Architecture.Solution.Template?label=NuGet)](https://www.nuget.org/packages/Clean.Architecture.Solution.Template)
-[![Nuget](https://img.shields.io/nuget/dt/Clean.Architecture.Solution.Template?label=Downloads)](https://www.nuget.org/packages/Clean.Architecture.Solution.Template)
-![Twitter Follow](https://img.shields.io/twitter/follow/jasontaylordev?label=Follow&style=social)
 
-The goal of this template is to provide a straightforward and efficient approach to enterprise application development, leveraging the power of Clean Architecture and ASP.NET Core. Using this template, you can effortlessly create a Single Page App (SPA) with ASP.NET Core and Angular or React, while adhering to the principles of Clean Architecture. Getting started is easy - simply install the **.NET template** (see below for full details).
+This template is a customized version of the [Clean Architecture Solution Template](https://github.com/jasontaylordev/CleanArchitecture) by [Jason Taylor](https://jasontaylor.dev/).
 
-If you find this project useful, please give it a star. Thanks! ⭐
+We acknowledge and appreciate the original work provided by Jason Taylor and the community. This version has been adapted to suit our team's specific requirements and development standards.
+
+## Team Template
+
+The goal of this template is to provide a straightforward and efficient approach to enterprise application development for our team, leveraging the power of Clean Architecture and ASP.NET Core. Be sure to check our internal documentation for specific guidelines.
+
+
+
+> **SETUP NOTE:** Before using this template, please search for `[OURTEAMNAME]` in the solution and replace it with your actual Team Name or Email address accordingly. Check `CleanArchitecture.nuspec`.
+
 
 ## Getting Started
 
 The following prerequisites are required to build and run the solution:
 
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (latest version)
-- [Node.js](https://nodejs.org/) (latest LTS, only required if you are using Angular or React)
+- [Node.js](https://nodejs.org/) (latest LTS, only required if you are using React)
 
 The easiest way to get started is to install the [.NET template](https://www.nuget.org/packages/Clean.Architecture.Solution.Template):
 ```
 dotnet new install Clean.Architecture.Solution.Template
 ```
 
-Once installed, create a new solution using the template. You can choose to use Angular, React, or create a Web API-only solution. Specify the client framework using the `-cf` or `--client-framework` option, and provide the output directory where your project will be created. Here are some examples:
+Once installed, create a new solution using the template. You can choose to use React or create a Web API-only solution. Specify the client framework using the `-cf` or `--client-framework` option, and provide the output directory where your project will be created. Here are some examples:
 
-To create a Single-Page Application (SPA) with Angular and ASP.NET Core:
+To create a Single-Page Application (SPA) with React and ASP.NET Core:
 ```bash
-dotnet new ca-sln --client-framework Angular --output YourProjectName
-```
-
-To create a SPA with React and ASP.NET Core:
-```bash
-dotnet new ca-sln -cf React -o YourProjectName
+dotnet new ca-sln --client-framework React --output YourProjectName
 ```
 
 To create a ASP.NET Core Web API-only solution:
@@ -69,11 +68,7 @@ dotnet new ca-usecase --help
 
 ## Database
 
-The template supports [PostgreSQL](https://www.postgresql.org), [SQLite](https://www.sqlite.org/), and [SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/what-is-sql-server) (default option). Specify the database to use with the `--database` option:
-
-```bash
-dotnet new ca-sln --database [postgresql|sqlite|sqlserver]
-```
+The template is configured to use **SQL Server** by default.
 
 On application startup, the database is automatically **deleted**, **recreated**, and **seeded** using `ApplicationDbContextInitialiser`. This is a practical strategy for early development, avoiding the overhead of maintaining migrations while keeping the schema and sample data in sync with the domain model.
 
@@ -102,7 +97,7 @@ azd up
 
 * [ASP.NET Core 9](https://docs.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core)
 * [Entity Framework Core 9](https://docs.microsoft.com/en-us/ef/core/)
-* [Angular 18](https://angular.dev/) or [React 18](https://react.dev/)
+* [React 18](https://react.dev/)
 * [MediatR](https://github.com/jbogard/MediatR)
 * [AutoMapper](https://automapper.org/)
 * [FluentValidation](https://fluentvalidation.net/)

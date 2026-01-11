@@ -6,7 +6,8 @@
     "Web",
     "SPA",
     "ASP.NET",
-    "Clean Architecture"],
+    "Clean Architecture"
+  ],
   "name": "Clean Architecture Solution",
   "description": "A Clean Architecture Solution Template for creating a Single-Page Application (SPA) with ASP.NET Core.",
   "identity": "Clean.Architecture.Solution.CSharp",
@@ -40,10 +41,6 @@
       "datatype": "choice",
       "choices": [
         {
-          "choice": "Angular",
-          "description": "Use Angular"
-        },
-        {
           "choice": "React",
           "description": "Use React"
         },
@@ -52,7 +49,7 @@
           "description": "Web API only"
         }
       ],
-      "defaultValue": "Angular",
+      "defaultValue": "React",
       "description": "The type of client framework to use"
     },
     "UseAngular": {
@@ -77,14 +74,6 @@
       "type": "parameter",
       "datatype": "choice",
       "choices": [
-        {
-          "choice": "postgresql",
-          "description": "PostgreSQL"
-        },
-        {
-          "choice": "sqlite",
-          "description": "SQLite"
-        },
         {
           "choice": "sqlserver",
           "description": "SQL Server"

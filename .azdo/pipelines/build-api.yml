@@ -1,0 +1,81 @@
+# Azure DevOps Build Pipeline for API
+# Builds and publishes the Backend API artifacts
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - 'src/Web/**'
+      - 'src/Application/**'
+      - 'src/Domain/**'
+      - 'src/Infrastructure/**'
+    exclude:
+      - 'src/Web/ClientApp/**' # Exclude UI changes
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - 'src/Web/**'
+    exclude:
+      - 'src/Web/ClientApp/**'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+  - checkout: self
+    displayName: 'Checkout code'
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore API'
+    inputs:
+      command: 'restore'
+      projects: 'src/Web/Web.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build API'
+    inputs:
+      command: 'build'
+      projects: 'src/Web/Web.csproj'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Test API'
+    inputs:
+      command: 'test'
+      projects: '**/*Tests.csproj'
+      arguments: '--no-build --configuration $(buildConfiguration) --filter "FullyQualifiedName!~AcceptanceTests"'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish API'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: 'src/Web/Web.csproj'
+      arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api'
+      zipAfterPublish: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: api-drop'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/api'
+      ArtifactName: 'api-drop'
+      publishLocation: 'Container'
