@@ -15,7 +15,7 @@
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-    <PackageVersion Include="MediatR" Version="13.1.0" />
+    <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="MediatR.Contracts" Version="2.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
@@ -50,34 +50,8 @@
     <PackageVersion Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
     <PackageVersion Include="SpecFlow.NUnit" Version="3.9.74" />
     <!--#endif-->
-    <!--#if (UseAspire)-->
-    <!--#if (UsePostgreSQL)-->
-    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.0.0" />
-    <!--#endif-->
-    <!--#if (UseSqlServer)-->
-    <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="13.0.0" />
-    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.0.0" />
-    <!--#endif-->
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.13.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.13.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.13.0" />
-    <!--#endif-->
-    <!--#if (UsePostgreSQL)-->
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0-rc.2" />
-    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.8.1" />
-    <!--#endif-->
-    <!--#if (UseSqlite)-->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfcoreVersion)" />
-    <!--#endif-->
-    <!--#if (UseSqlServer)-->
+
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.8.1" />
-    <!--#endif-->
   </ItemGroup>
 </Project>
