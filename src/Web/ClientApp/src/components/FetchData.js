@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import followIfLoginRedirect from './api-authorization/followIfLoginRedirect';
-import { WeatherForecastsClient } from '../web-api-client.ts';
+import { WeatherForecastsClient } from '../web-api-client';
 
 export class FetchData extends Component {
   static displayName = FetchData.name;
